@@ -103,17 +103,9 @@ class Main extends Component {
 
     handleLineProductChange = (event, orderDetailLineNo) => {
         const { name, value } = event.target;
-        console.log(name, value);
         
-        this.setState(({ order }) => {
-            order.order_details.filter(detail => detail.line_no === orderDetailLineNo) {
-                return (
-                    {
-                        order: { order_details: { ...order,  }
-                    }
-                );
-            };
-        });
+        const { order } = this.state;
+        // const order_detail = order.order_details.filter(detail => detail.line_no === orderDetailLineNo);
 
     };
 
