@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { Grid, withStyles } from '@material-ui/core';
+import { useAuth0 } from "../../react-auth0-spa";
 
 import FarmersTable from '../../components/Farmers';
 import OrdersTable from '../../components/Orders';
@@ -56,16 +57,19 @@ class Main extends Component {
         }
     };
 
-    componentDidMount() {
-        getFarmers()
+    async componentDidMount() {
+        const { getTokenSilently } = useAuth0();
+        const token = await getTokenSilently();
+
+        getFarmers(token)
             .then(data => data['data'])
             .then(data => this.setState({ farmers: data }));
 
-        getProducts()
+        getProducts(token)
             .then(data => data['data'])
             .then(data => this.setState({ products: data }));
 
-        getOrders()
+        getOrders(token)
             .then(data => data['data'])
             .then(data => this.setState({ orders: data }));
     };
@@ -103,7 +107,7 @@ class Main extends Component {
 
     handleLineProductChange = (event, orderDetailLineNo) => {
         const { name, value } = event.target;
-        
+
         const { order } = this.state;
         // const order_detail = order.order_details.filter(detail => detail.line_no === orderDetailLineNo);
 

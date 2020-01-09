@@ -1,6 +1,6 @@
 import { BASE_URL } from '../../utils';
 
-export const getProducts = async () => {
+export const getProducts = async token => {
     const response = await fetch(`${BASE_URL}/products`);
     return await response.json();
 }
