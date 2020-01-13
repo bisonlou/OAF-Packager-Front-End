@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Grid, withStyles } from '@material-ui/core';
 import { useAuth0 } from "../../react-auth0-spa";
@@ -17,239 +17,274 @@ import { getOrders, saveOrder } from '../../services/orderService';
 
 import MainStyles from '../../styles/main';
 
-class Main extends Component {
-    state = {
-        farmers: [],
-        products: [],
-        orders: [],
-        showProductPopper: false,
-        showFarmerPopper: false,
-        showOderPopper: false,
-        addFarmerError: '',
-        addProductError: '',
-        addOrderError: '',
-        orderDetailLines: 1,
-        farmer: {
-            firstname: '',
-            lastname: '',
-            phone: '',
-            email: '',
-            country: '',
-            state: '',
-            village: '',
-        },
-        product: {
-            description: '',
-            name: '',
-            qty: 0,
-            unit_price: 0,
-            units: '',
-        },
-        order: {
-            farmer_id: null,
-            order_date: Date.now(),
-            order_details: [{
-                product_id: null,
-                line_no: 1,
-                order_qty: 0,
-                order_total: 0
-            }]
-        }
-    };
+const Main = ({ classes }) => {
+    const [farmers, setFarmers] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
 
-    async componentDidMount() {
-        const { getTokenSilently } = useAuth0();
+    const [showProductPopper, setShowProductPopper] = useState(false);
+    const [showFarmerPopper, setShowFarmerPopper] = useState(false);
+    const [showOrderPopper, setShowOderPopper] = useState(false);
+
+    const [addFarmerError, setAddFarmerError] = useState('');
+    const [addProductError, setAddProductError] = useState('');
+    const [addOrderError, setAddOrderError] = useState('');
+
+    const [farmer, setFarmer] = useState({
+        firstname: '',
+        lastname: '',
+        phone: '',
+        email: '',
+        country: '',
+        state: '',
+        village: '',
+    });
+    const [product, setProduct] = useState({
+        description: '',
+        name: '',
+        qty: 0,
+        unit_price: 0,
+        units: '',
+    });
+    const [order, setOrder] = useState({
+        farmer_id: null,
+        order_date: Date.now(),
+        order_details: [{
+            product_id: null,
+            line_no: 1,
+            order_qty: 0,
+            order_total: 0
+        }]
+    });
+    const [token, setToken] = useState('');
+
+
+    // state = {
+    //     farmers: [],
+    //     products: [],
+    //     orders: [],
+    //     showProductPopper: false,
+    //     showFarmerPopper: false,
+    //     showOderPopper: false,
+    //     addFarmerError: '',
+    //     addProductError: '',
+    //     addOrderError: '',
+    //     orderDetailLines: 1,
+    //     farmer: {
+    //         firstname: '',
+    //         lastname: '',
+    //         phone: '',
+    //         email: '',
+    //         country: '',
+    //         state: '',
+    //         village: '',
+    //     },
+    //     product: {
+    //         description: '',
+    //         name: '',
+    //         qty: 0,
+    //         unit_price: 0,
+    //         units: '',
+    //     },
+    //     order: {
+    //         farmer_id: null,
+    //         order_date: Date.now(),
+    //         order_details: [{
+    //             product_id: null,
+    //             line_no: 1,
+    //             order_qty: 0,
+    //             order_total: 0
+    //         }]
+    //     }
+    // };
+
+    
+    const { getTokenSilently } = useAuth0();
+
+    useEffect(async () => {
         const token = await getTokenSilently();
+        setToken(token);
+        console.log(token);
 
         getFarmers(token)
             .then(data => data['data'])
-            .then(data => this.setState({ farmers: data }));
+            .then(data => setFarmer(data));
 
         getProducts(token)
             .then(data => data['data'])
-            .then(data => this.setState({ products: data }));
+            .then(data => setProduct(data));
 
         getOrders(token)
             .then(data => data['data'])
-            .then(data => this.setState({ orders: data }));
+            .then(data => this.setState(data));
+    }, []);
+
+    const handleAddProductClick = () => {
+        setShowProductPopper(true);
     };
 
-    handleAddProductClick = () => {
-        this.setState({ showProductPopper: true });
+    const handleAddFarmerClick = () => {
+        setShowFarmerPopper(true);
     };
 
-    handleAddFarmerClick = () => {
-        this.setState({ showFarmerPopper: true });
+    const handleAddOrderClick = () => {
+        setShowOderPopper(true);
     };
 
-    handleAddOrderClick = () => {
-        this.setState({ showOrderPopper: true });
-    };
-
-    handleFarmerChange = event => {
+    const handleFarmerChange = event => {
         const { name, value } = event.target;
-        this.setState(({ farmer }) => ({ farmer: { ...farmer, [name]: value } }));
+        setFarmer({ ...farmer, [name]: value } );
     };
 
-    handleProductChange = event => {
+    const handleProductChange = event => {
         const { name, value } = event.target;
-        this.setState(({ product }) => ({ product: { ...product, [name]: value } }));
+        setProduct({ ...product, [name]: value });
     };
 
-    handleOrderChange = event => {
+    const handleOrderChange = event => {
         const { name, value } = event.target;
-        this.setState(({ order }) => ({ order: { ...order, [name]: value } }));
+        setOrder({...order, [name]: value });
     };
 
-    handleOrderDateChange = order_date => {
-        this.setState(({ order }) => ({ order: { ...order, order_date: order_date } }));
+    const handleOrderDateChange = order_date => {
+        setOrder({ ...order, order_date: order_date });
     };
 
-    handleLineProductChange = (event, orderDetailLineNo) => {
+    const handleLineProductChange = (event, orderDetailLineNo) => {
         const { name, value } = event.target;
 
-        const { order } = this.state;
         // const order_detail = order.order_details.filter(detail => detail.line_no === orderDetailLineNo);
 
     };
 
-    handleSaveFarmerClick = () => {
+    const handleSaveFarmerClick = async () => {
         const { farmer } = this.state;
 
-        saveFarmer(farmer)
+        saveFarmer(token, farmer)
             .then(data => {
                 if (data['success'] === true) {
-                    this.setState(({ farmers }) => ({
-                        showFarmerPopper: false,
-                        farmers: [...farmers, farmer]
-                    }));
+                    setShowFarmerPopper(false);
+                    setFarmers([...farmers, farmer])
                 } else {
-                    this.setState({ addFarmerError: 'error adding farmer. please try again!' })
+                    setAddFarmerError('error adding farmer. please try again!');
                 }
             })
     };
 
-    handleSaveProductClick = () => {
+    const handleSaveProductClick = async () => {
         const { product } = this.state;
 
-        saveProduct(product)
+        saveProduct(token, product)
             .then(data => {
                 if (data['success'] === true) {
-                    this.setState(({ products }) => ({
-                        showProductPopper: false,
-                        products: [...products, product]
-                    }));
+                    setShowProductPopper(false);
+                    setProducts([...products, product]);
                 } else {
-                    this.setState({ addProductError: 'error adding product. please try again!' })
+                    setAddProductError('error adding product. please try again!');
                 }
             })
     };
 
-    handleSaveOrderClick = () => {
+    const handleSaveOrderClick = async () => {
         const { order } = this.state;
 
-        saveProduct(order)
+        saveProduct(token, order)
             .then(data => {
                 if (data['success'] === true) {
-                    this.setState(({ orders }) => ({
-                        showOrderPopper: false,
-                        orders: [...orders, order]
-                    }));
+                    setShowOderPopper(false);
+                    setOrders([...orders, order])
                 } else {
-                    this.setState({ addOrderError: 'error adding order. please try again!' })
+                    setAddOrderError('error adding order. please try again!');
                 }
             })
     };
 
 
-    handleCancelSaveFarmerClick = () => {
-        this.setState({ showFarmerPopper: false });
+    const handleCancelSaveFarmerClick = () => {
+        setShowFarmerPopper(false);
     };
 
-    handleCancelSaveProductClick = () => {
-        this.setState({ showProductPopper: false });
+    const handleCancelSaveProductClick = () => {
+        setShowProductPopper(showProductPopper);
     };
 
-    handleCancelSaveOrderClick = () => {
-        this.setState({ showorderPopper: false });
+    const handleCancelSaveOrderClick = () => {
+        setShowOderPopper(false);
     };
 
+    // render() {
+    //     const { classes } = this.props;
+    //     const { farmers, products, orders, order,
+    //         showFarmerPopper, showOrderPopper, addOrderError,
+    //         showProductPopper, addFarmerError, addProductError,
+    //     } = this.state;
 
-    render() {
-        const { classes } = this.props;
-        const { farmers, products, orders, order,
-            showFarmerPopper, showOrderPopper, addOrderError,
-            showProductPopper, addFarmerError, addProductError,
-        } = this.state;
+    return (
+        <div>
+            <NavBar />
 
-        return (
-            <div>
-                <NavBar />
+            <Grid container spacing={1} justify="center">
+                <Grid container item xs={12} spacing={3} className={classes.root}>
+                    <Grid item xs={4}>
+                        <FarmersTable
+                            farmers={farmers}
+                            onAddClick={handleAddFarmerClick} />
+                    </Grid>
 
-                <Grid container spacing={1} justify="center">
-                    <Grid container item xs={12} spacing={3} className={classes.root}>
-                        <Grid item xs={4}>
-                            <FarmersTable
-                                farmers={farmers}
-                                onAddClick={this.handleAddFarmerClick} />
-                        </Grid>
+                    <Grid item xs={4}>
+                        <ProductsTable
+                            products={products}
+                            onAddClick={handleAddProductClick}
+                        />
+                    </Grid>
 
-                        <Grid item xs={4}>
-                            <ProductsTable
-                                products={products}
-                                onAddClick={this.handleAddProductClick}
-                            />
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <OrdersTable
-                                orders={orders}
-                                onAddClick={this.handleAddOrderClick}
-                            />
-                        </Grid>
+                    <Grid item xs={4}>
+                        <OrdersTable
+                            orders={orders}
+                            onAddClick={handleAddOrderClick}
+                        />
                     </Grid>
                 </Grid>
-                {
-                    showFarmerPopper && (
-                        <AddFarmerForm
-                            addFarmerError={addFarmerError}
-                            onTextChange={this.handleFarmerChange}
-                            onSaveClick={this.handleSaveFarmerClick}
-                            onCancelClick={this.handleCancelSaveFarmerClick}
-                        />
-                    )
-                }
+            </Grid>
+            {
+                showFarmerPopper && (
+                    <AddFarmerForm
+                        addFarmerError={addFarmerError}
+                        onTextChange={handleFarmerChange}
+                        onSaveClick={handleSaveFarmerClick}
+                        onCancelClick={handleCancelSaveFarmerClick}
+                    />
+                )
+            }
 
-                {
-                    showProductPopper && (
-                        <AddProductForm
-                            addProductError={addProductError}
-                            onTextChange={this.handleProductChange}
-                            onSaveClick={this.handleSaveProductClick}
-                            onCancelClick={this.handleCancelSaveProductClick}
-                        />
-                    )
-                }
+            {
+                showProductPopper && (
+                    <AddProductForm
+                        addProductError={addProductError}
+                        onTextChange={handleProductChange}
+                        onSaveClick={handleSaveProductClick}
+                        onCancelClick={handleCancelSaveProductClick}
+                    />
+                )
+            }
 
-                {
-                    showOrderPopper && (
-                        <AddOrderForm
-                            order={order}
-                            farmers={farmers}
-                            products={products}
-                            addOrderError={addOrderError}
-                            onTextChange={this.handleOrderChange}
-                            onSaveClick={this.handleSaveOrderClick}
-                            onDateChange={this.handleOrderDateChange}
-                            onCancelClick={this.handleCancelSaveOrderClick}
-                            onFarmerChange={this.handleSelectedFarmerChange}
-                            onLineProductChange={this.handleLineProductChange}
-                        />
-                    )
-                }
-            </div >
-        );
-    }
+            {
+                showOrderPopper && (
+                    <AddOrderForm
+                        order={order}
+                        farmers={farmers}
+                        products={products}
+                        addOrderError={addOrderError}
+                        onTextChange={handleOrderChange}
+                        onSaveClick={handleSaveOrderClick}
+                        onDateChange={handleOrderDateChange}
+                        onCancelClick={handleCancelSaveOrderClick}
+                        onLineProductChange={handleLineProductChange}
+                    />
+                )
+            }
+        </div >
+    );
 }
 
 export default withStyles(MainStyles)(Main)

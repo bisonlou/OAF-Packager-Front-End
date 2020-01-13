@@ -11,12 +11,13 @@ export const getFarmers = async token => {
     return await response.json();
 }
 
-export const saveFarmer = async (farmer) => {
+export const saveFarmer = async (token, farmer) => {
     const response = await fetch(`${BASE_URL}/farmers`, {
         method: 'POST',
         body: JSON.stringify(farmer),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         }
     });
 
