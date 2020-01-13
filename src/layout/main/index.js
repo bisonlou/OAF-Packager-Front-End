@@ -98,26 +98,26 @@ const Main = ({ classes }) => {
     //     }
     // };
 
-    
+
     const { getTokenSilently } = useAuth0();
 
     useEffect(async () => {
         const token = await getTokenSilently();
         setToken(token);
-        console.log(token);
 
         getFarmers(token)
             .then(data => data['data'])
-            .then(data => setFarmer(data));
+            .then(data => setFarmers(data))
+            .catch(error => console.log(error));
 
         getProducts(token)
             .then(data => data['data'])
-            .then(data => setProduct(data));
+            .then(data => setProducts(data));
 
         getOrders(token)
             .then(data => data['data'])
-            .then(data => this.setState(data));
-    }, []);
+            .then(data => this.setOrders(data));
+    }, [getTokenSilently]);
 
     const handleAddProductClick = () => {
         setShowProductPopper(true);
@@ -133,7 +133,7 @@ const Main = ({ classes }) => {
 
     const handleFarmerChange = event => {
         const { name, value } = event.target;
-        setFarmer({ ...farmer, [name]: value } );
+        setFarmer({ ...farmer, [name]: value });
     };
 
     const handleProductChange = event => {
@@ -143,7 +143,7 @@ const Main = ({ classes }) => {
 
     const handleOrderChange = event => {
         const { name, value } = event.target;
-        setOrder({...order, [name]: value });
+        setOrder({ ...order, [name]: value });
     };
 
     const handleOrderDateChange = order_date => {

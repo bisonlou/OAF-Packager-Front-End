@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://oaf-packager.herokuapp.com/'; 
+export const BASE_URL = 'https://oaf-packager.herokuapp.com'; 
 
 export const formatDate = (rawDate) => {
     const longDateTime = new Date(rawDate);

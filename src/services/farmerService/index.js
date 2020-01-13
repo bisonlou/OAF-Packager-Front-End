@@ -2,12 +2,15 @@ import { BASE_URL } from '../../utils';
 
 
 export const getFarmers = async token => {
-    const response = await fetch(`${BASE_URL}/farmers`, {
+    const url = `${BASE_URL}/farmers`;
+    
+    const response = await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }
     });
+    console.log(response);
     return await response.json();
 }
 
