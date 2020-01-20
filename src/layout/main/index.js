@@ -57,53 +57,14 @@ const Main = ({ classes }) => {
         }]
     });
     const [token, setToken] = useState('');
-
-
-    // state = {
-    //     farmers: [],
-    //     products: [],
-    //     orders: [],
-    //     showProductPopper: false,
-    //     showFarmerPopper: false,
-    //     showOderPopper: false,
-    //     addFarmerError: '',
-    //     addProductError: '',
-    //     addOrderError: '',
-    //     orderDetailLines: 1,
-    //     farmer: {
-    //         firstname: '',
-    //         lastname: '',
-    //         phone: '',
-    //         email: '',
-    //         country: '',
-    //         state: '',
-    //         village: '',
-    //     },
-    //     product: {
-    //         description: '',
-    //         name: '',
-    //         qty: 0,
-    //         unit_price: 0,
-    //         units: '',
-    //     },
-    //     order: {
-    //         farmer_id: null,
-    //         order_date: Date.now(),
-    //         order_details: [{
-    //             product_id: null,
-    //             line_no: 1,
-    //             order_qty: 0,
-    //             order_total: 0
-    //         }]
-    //     }
-    // };
-
-
+    
     const { getTokenSilently } = useAuth0();
 
     useEffect(async () => {
         const token = await getTokenSilently();
         setToken(token);
+
+        console.log(token)
 
         getFarmers(token)
             .then(data => data['data'])

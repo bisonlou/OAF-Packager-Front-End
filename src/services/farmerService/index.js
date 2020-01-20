@@ -10,7 +10,6 @@ export const getFarmers = async token => {
             'Authorization': `Bearer ${token}`
         }
     });
-    console.log(response);
     return await response.json();
 }
 

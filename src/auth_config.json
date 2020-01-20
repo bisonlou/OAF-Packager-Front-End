@@ -1,5 +1,5 @@
 {
     "domain": "dev-xspoxxt1.auth0.com",
     "clientId": "Q9N8kDKcFwke34AmQzYxnanm8nADYs2I",
-    "audience": "https://oaf-seed-packager-front.herokuapp.com/"
+    "audience": "oaf-seed-packager"
   }
