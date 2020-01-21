@@ -64,7 +64,7 @@ const Main = ({ classes }) => {
         const token = await getTokenSilently();
         setToken(token);
 
-        console.log(token)
+        console.log('token---->', token)
 
         getFarmers(token)
             .then(data => data['data'])
