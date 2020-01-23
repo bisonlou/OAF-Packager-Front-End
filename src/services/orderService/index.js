@@ -10,7 +10,9 @@ export const getOrders = async token => {
     return await response.json();
 }
 
-export const saveOrder = async (token, order) => {
+export const saveOrder = async (token, order, orderDetais) => {
+    order.order_details = orderDetais
+    console.log(order)
     const response = await fetch(`${BASE_URL}/orders`, {
         method: 'POST',
         body: JSON.stringify(order),
@@ -19,5 +21,6 @@ export const saveOrder = async (token, order) => {
             'Authorization': `Bearer ${token}`
         }
     });
+    console.log(response.json())
     return await response.json();
 }

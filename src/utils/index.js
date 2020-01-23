@@ -17,3 +17,13 @@ export const formatDate = (rawDate) => {
   
     return `${day} ${date} ${month} ${year}`;
   };
+
+export const dateToString = date => {
+  const mm = date.getMonth() + 1;
+  const dd = date.getDate();
+
+  return [date.getFullYear(),
+          (mm>9 ? '' : '0') + mm,
+          (dd>9 ? '' : '0') + dd
+         ].join('-');
+}

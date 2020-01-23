@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Popover, TextField, Grid,
     withStyles, Button, Typography,
     FormControl, Select, MenuItem, InputLabel,
-    InputAdornment 
 } from '@material-ui/core';
 import {
     MuiPickersUtilsProvider,
@@ -14,9 +13,8 @@ import DateFnsUtils from '@date-io/date-fns';
 import AddFarmerFormStyles from '../../styles/addFarmerForm'
 
 const AddProductForm = ({
-    classes, onSaveClick, onCancelClick, onTextChange,
-    addOrderError, farmers, order, onDateChange, products,
-    onLineProductChange,
+    classes, onSaveClick, onCancelClick, onTextChange, onOrderDetailChange,
+    addOrderError, farmers, order, orderDetails, onDateChange, products, addNewLineClick
 }) => {
 
     return (
@@ -83,14 +81,14 @@ const AddProductForm = ({
                 </Grid>
             </Grid>
             {
-                order.order_details.map(order_detail => (
+                orderDetails.map(order_detail => (
 
                     <Grid>
                         <FormControl className={classes.formControl}>
                             <Select
                                 name="product_id"
                                 displayEmpty
-                                onChange={event => onLineProductChange(event, order_detail.line_no)}
+                                onChange={onOrderDetailChange}
                                 className={classes.detaiTextField}
                             >
                                 <MenuItem disabled>Select Product</MenuItem>
@@ -113,13 +111,9 @@ const AddProductForm = ({
                             id="outlined-size-small"
                             variant="outlined"
                             size="small"
-                            name="qty"
+                            name="order_qty"
                             type="number"
-                            endAdornment={
-                            <InputAdornment position="end">
-                                {'kgs'}
-                            </InputAdornment>}
-                            onChange={onTextChange}
+                            onChange={onOrderDetailChange}
                             className={classes.detaiTextField}
                         />
 
@@ -130,7 +124,7 @@ const AddProductForm = ({
                             size="small"
                             name="unit_price"
                             type="number"
-                            onChange={onTextChange}
+                            onChange={onOrderDetailChange}
                             className={classes.detaiTextField}
                         />
 
@@ -141,7 +135,7 @@ const AddProductForm = ({
                             size="small"
                             name="line_total"
                             type="number"
-                            onChange={onTextChange}
+                            onChange={onOrderDetailChange}
                             className={classes.detaiTextField}
                         />
 
@@ -150,7 +144,8 @@ const AddProductForm = ({
                             size="small"
                             color="primary"
                             className={classes.button}
-                            onClick={onCancelClick}
+                            onClick={addNewLineClick}
+                            disabled
                         >
                             Add
                         </Button>

@@ -14,6 +14,7 @@ import AddOrderForm from '../../components/Orders/AddOrderForm'
 import { getFarmers, saveFarmer } from '../../services/farmerService';
 import { getProducts, saveProduct } from '../../services/productService';
 import { getOrders, saveOrder } from '../../services/orderService';
+import { dateToString } from '../../utils'
 
 import MainStyles from '../../styles/main';
 
@@ -39,6 +40,7 @@ const Main = ({ classes }) => {
         state: '',
         village: '',
     });
+
     const [product, setProduct] = useState({
         description: '',
         name: '',
@@ -46,18 +48,23 @@ const Main = ({ classes }) => {
         unit_price: 0,
         units: '',
     });
+
     const [order, setOrder] = useState({
         farmer_id: null,
-        order_date: Date.now(),
-        order_details: [{
+        order_date: Date.now()
+    });
+
+    const [orderDetails, setOrderDetails] = useState([
+        {
             product_id: null,
             line_no: 1,
             order_qty: 0,
-            order_total: 0
-        }]
-    });
+            line_total: 0
+        }
+    ]);
+
     const [token, setToken] = useState('');
-    
+
     const { getTokenSilently } = useAuth0();
 
     useEffect(async () => {
@@ -77,7 +84,7 @@ const Main = ({ classes }) => {
 
         getOrders(token)
             .then(data => data['data'])
-            .then(data => this.setOrders(data));
+            .then(data => setOrders(data));
     }, [getTokenSilently]);
 
     const handleAddProductClick = () => {
@@ -108,17 +115,12 @@ const Main = ({ classes }) => {
     };
 
     const handleOrderDateChange = order_date => {
-        setOrder({ ...order, order_date: order_date });
+        const date_string = dateToString(order_date)
+
+        setOrder({ ...order, order_date: date_string });
     };
 
-    const handleLineProductChange = (event, orderDetailLineNo) => {
-        const { name, value } = event.target;
-
-        // const order_detail = order.order_details.filter(detail => detail.line_no === orderDetailLineNo);
-
-    };
-
-    const handleSaveFarmerClick = async () => {
+    const handleSaveFarmerClick = () => {
         const { farmer } = this.state;
 
         saveFarmer(token, farmer)
@@ -132,7 +134,7 @@ const Main = ({ classes }) => {
             })
     };
 
-    const handleSaveProductClick = async () => {
+    const handleSaveProductClick = () => {
         const { product } = this.state;
 
         saveProduct(token, product)
@@ -146,10 +148,8 @@ const Main = ({ classes }) => {
             })
     };
 
-    const handleSaveOrderClick = async () => {
-        const { order } = this.state;
-
-        saveProduct(token, order)
+    const handleSaveOrderClick = () => {
+        saveOrder(token, order, orderDetails)
             .then(data => {
                 if (data['success'] === true) {
                     setShowOderPopper(false);
@@ -173,12 +173,24 @@ const Main = ({ classes }) => {
         setShowOderPopper(false);
     };
 
-    // render() {
-    //     const { classes } = this.props;
-    //     const { farmers, products, orders, order,
-    //         showFarmerPopper, showOrderPopper, addOrderError,
-    //         showProductPopper, addFarmerError, addProductError,
-    //     } = this.state;
+    const handleOrderDetailChange = event => {
+        const { name, value } = event.target;
+        const currentOrderDetails = orderDetails[0];
+
+        setOrderDetails([{
+            ...currentOrderDetails,
+            [name]: parseInt(value)
+        }])
+    };
+
+    const handleAddNewLineDetail = () => {
+        setOrderDetails([...orderDetails, {
+            product_id: null,
+            line_no: 1,
+            order_qty: 0,
+            order_total: 0
+        }])
+    };
 
     return (
         <div>
@@ -235,12 +247,14 @@ const Main = ({ classes }) => {
                         order={order}
                         farmers={farmers}
                         products={products}
+                        orderDetails={orderDetails}
                         addOrderError={addOrderError}
                         onTextChange={handleOrderChange}
                         onSaveClick={handleSaveOrderClick}
                         onDateChange={handleOrderDateChange}
+                        addNewLineClick={handleAddNewLineDetail}
                         onCancelClick={handleCancelSaveOrderClick}
-                        onLineProductChange={handleLineProductChange}
+                        onOrderDetailChange={handleOrderDetailChange}
                     />
                 )
             }
