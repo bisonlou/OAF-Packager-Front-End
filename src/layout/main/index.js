@@ -50,13 +50,13 @@ const Main = ({ classes }) => {
     });
 
     const [order, setOrder] = useState({
-        farmer_id: null,
+        farmer_id: 1,
         order_date: Date.now()
     });
 
     const [orderDetails, setOrderDetails] = useState([
         {
-            product_id: null,
+            product_id: 1,
             line_no: 1,
             order_qty: 0,
             line_total: 0
@@ -121,8 +121,6 @@ const Main = ({ classes }) => {
     };
 
     const handleSaveFarmerClick = () => {
-        const { farmer } = this.state;
-
         saveFarmer(token, farmer)
             .then(data => {
                 if (data['success'] === true) {
@@ -135,8 +133,6 @@ const Main = ({ classes }) => {
     };
 
     const handleSaveProductClick = () => {
-        const { product } = this.state;
-
         saveProduct(token, product)
             .then(data => {
                 if (data['success'] === true) {
